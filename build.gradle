@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.spongepowered:mixin:0.7.11-SNAPSHOT"
+    implementation "org.spongepowered:mixin:0.8"
 }
 
 jar {
@@ -72,7 +72,6 @@ reobf {
 }
 
 build.dependsOn(shadowJar)
-
 
 processResources {
     // this will ensure that this task is redone when the versions change.
