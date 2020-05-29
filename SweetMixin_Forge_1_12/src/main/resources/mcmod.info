@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "sweetmixin",
+    "name": "SweetMixin",
+    "description": "Mixin playground for Forge",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://github.com/GlassSpirit/JustMixins",
+    "updateUrl": "",
+    "authorList": [
+      "GlassSpirit"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

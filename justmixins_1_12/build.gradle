@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.spongepowered:mixin:0.8"
+    implementation "org.spongepowered:mixin:0.8.1-SNAPSHOT"
 }
 
 jar {
