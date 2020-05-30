@@ -26,6 +26,9 @@ apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
 apply plugin: "com.github.johnrengelman.shadow"
 
+sourceCompatibility = targetCompatibility = 1.8
+compileJava.options.encoding = compileTestJava.options.encoding = "UTF-8"
+
 version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
