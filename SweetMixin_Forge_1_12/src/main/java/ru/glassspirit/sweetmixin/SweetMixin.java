@@ -1,6 +1,5 @@
 package ru.glassspirit.sweetmixin;
 
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -19,7 +18,7 @@ public class SweetMixin {
 
     @Mod.EventHandler
     public void preinit(FMLPreInitializationEvent event) {
-        EssenceContainer essencePlayer = (EssenceContainer) Minecraft.getMinecraft().player;
+
     }
 
     @Mod.EventHandler

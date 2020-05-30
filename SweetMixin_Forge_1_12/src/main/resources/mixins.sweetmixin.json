@@ -1,9 +1,11 @@
 {
+  "minVersion": "0.7.10",
   "compatibilityLevel": "JAVA_8",
   "package": "ru.glassspirit.sweetmixin.mixin",
   "refmap": "mixins.sweetmixin.refmap.json",
   "mixins": [
-    "MixinEntityPlayer"
+    "MixinEntityPlayer",
+    "MixinItemStack"
   ],
   "client": [],
   "server": []
