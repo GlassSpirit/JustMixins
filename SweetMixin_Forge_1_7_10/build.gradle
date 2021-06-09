@@ -1,17 +1,19 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             name = "forge"
-            url = "https://files.minecraftforge.net/maven"
+            url = "https://maven.minecraftforge.net/"
         }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT"
+        // Магическая версия ForgeGradle 1.2, поддерживающая Gradle 6+
+        classpath("com.anatawa12.forge:ForgeGradle:1.2-1.0.+") {
+            changing = true
+        }
     }
 }
 
-apply plugin: "java"
 apply plugin: "forge"
 
 sourceCompatibility = targetCompatibility = 1.8
@@ -22,38 +24,53 @@ group = modGroup
 archivesBaseName = modBaseName
 
 minecraft {
-    version = project.forgeVersion
-    mappings = project.mcpVersion
-
+    version = "1.7.10-10.13.4.1566-1.7.10"
+    mappings = "stable_12"
     runDir = "run"
+    // Для того, чтобы запустить или отдадить миксины в dev среде на 1.7.10, нужно:
+    // 1. Создать новую конфигурацию запуска Application (или изменить существующую)
+    // 2. В Program Arguments добавить --tweakClass "org.spongepowered.asm.launch.MixinTweaker" --mixin "mixins.sweetmixin.json"
 }
 
 repositories {
     mavenCentral()
-    maven {
-        url "http://repo.spongepowered.org/maven"
-    }
+    maven { url = "https://repo.spongepowered.org/maven" }
 }
 
 dependencies {
-    compile "org.spongepowered:mixin:0.7.11-SNAPSHOT"
-}
-
-sourceSets {
-    main {
-        ext.refMap = "mixins.sweetmixin.refmap.json"
+    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        exclude module: "launchwrapper"
+        exclude module: 'guava'
     }
+    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+
+    /*
+    // Неудачная попытка подружить 0.8.3 с 1.7.10
+    // Запускается, но не все миксины работают, причина вероятно в использовании разных версий ASM
+
+    implementation "org.spongepowered:mixin:0.8.3-SNAPSHOT"
+    annotationProcessor("org.spongepowered:mixin:0.8.3-SNAPSHOT")
+
+    implementation "com.google.guava:guava:21.0"
+    implementation "org.ow2.asm:asm-debug-all:5.2"
+    implementation "org.ow2.asm:asm-tree:7.2"
+    implementation "org.ow2.asm:asm-commons:7.2"
+    implementation "org.ow2.asm:asm-util:7.2"
+     */
 }
 
-def refMap = "${tasks.compileJava.temporaryDir}" + File.separator + "mixins.sweetmixin.refmap.json"
 jar {
-    from refMap
-    manifest.attributes(
-            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-            "MixinConfigs": "mixins.sweetmixin.json",
-            "FMLCorePluginContainsFMLMod": "true",
-            "ForceLoadAsMod": "true",
-    )
+    manifest {
+        attributes([
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.version,
+                "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+                "MixinConfigs": "mixins.sweetmixin.json",
+                "FMLCorePluginContainsFMLMod": "true",  // Не забываем указать эти два флага,
+                "ForceLoadAsMod": "true",               // чтобы Forge нормально загрузил и мод, и миксины
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
 processResources {
@@ -69,11 +86,37 @@ processResources {
     }
 }
 
-def mixinSrg = "${tasks.reobf.temporaryDir}" + File.separator + "mixins.srg"
-afterEvaluate {
-    tasks.compileJava.options.compilerArgs += ["-AreobfSrgFile=${tasks.reobf.srg}", "-AoutSrgFile=${mixinSrg}", "-AoutRefMapFile=${refMap}"]
+// Дальше начинается магический код, который понятен лишь избранным, но вроде бы он заменяет фунционал
+// MixinGradle плагина, отсутствующего для ForgeGradle 1.2 (что-то связанное с генерацией и упаковкой refmap)
+
+ext {
+    mixinSrg = new File(project.buildDir, 'mixins/mixin.sweetmixin.srg')
+    mixinRefMapName = "mixins.sweetmixin.refmap.json";
+    mixinRefMap = new File(project.buildDir, "mixins/" + mixinRefMapName)
+}
+
+jar {
+    from project.mixinRefMap
 }
 
 reobf {
-    addExtraSrgFile mixinSrg
+    addExtraSrgFile project.mixinSrg
 }
+
+compileJava {
+    options.compilerArgs += [
+            '-Xlint:-processing',
+            "-AoutSrgFile=${project.mixinSrg.canonicalPath}",
+            "-AoutRefMapFile=${project.mixinRefMap.canonicalPath}",
+            "-AreobfSrgFile=${project.file('build/srgs/mcp-srg.srg').canonicalPath}"
+    ]
+}
+
+task copySrgs(type: Copy, dependsOn: 'genSrgs') {
+    from plugins.getPlugin("forge").delayedFile('{SRG_DIR}')
+
+    include '**/*.srg'
+    into 'build/srgs'
+}
+
+compileJava.dependsOn copySrgs
