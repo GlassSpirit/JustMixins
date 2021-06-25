@@ -1,3 +1,5 @@
-Simple mod that adds sponge mixins environment, so you don't need to shade it into your mod (mainly on client side).
+This is repository with examples of Mixins usage for [this tutorial (RU)](http://https://forum.mcmodding.ru/resources/miksiny-dlja-chajnikov-praktika.213/ "this tutorial").
 
-https://github.com/SpongePowered/Mixin
+For bootstraping mixins on client/server use
+* https://github.com/CrucibleMC/Grimoire (1.7.10)
+* https://github.com/LXGaming/MixinBootstrap (1.12+)
