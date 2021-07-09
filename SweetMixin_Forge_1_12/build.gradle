@@ -60,12 +60,6 @@ minecraft {
             // Нужно для работы миксинов в DEV среде
             // Program arguments to setup and run MIXINS
             args '--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', 'mixins.sweetmixin.json'
-
-            mods {
-                sweetmixin {
-                    source sourceSets.main
-                }
-            }
         }
 
         server {
@@ -86,12 +80,6 @@ minecraft {
             // Нужно для работы миксинов в DEV среде
             // Program arguments to setup and run MIXINS
             args '--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', 'mixins.sweetmixin.json'
-
-            mods {
-                sweetmixin {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }

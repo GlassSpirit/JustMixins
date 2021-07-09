@@ -57,11 +57,6 @@ minecraft {
 
             arg "-mixin.config=mixins.sweetmixin.json"
 
-            mods {
-                sweetmixin {
-                    source sourceSets.main
-                }
-            }
         }
 
         server {
